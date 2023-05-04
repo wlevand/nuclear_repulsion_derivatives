@@ -165,7 +165,7 @@ def test_one_der():
 
 ## example of use
 
-# molecule
+# molecule HCOOH
 # [[ 0.        0.419376  0.      ]
 #  [-1.025551 -0.441399  0.      ]
 #  [ 1.153173  0.112123  0.      ]
@@ -176,7 +176,7 @@ def test_one_der():
 # [12, 8, 8, 1, 1]
 
 # x_1, x_0, y_0, z_2
-variables = [((1, 3), (0, 1)), ((0, 0), (2, 2))]
+variables = [((0, 1), (0, 0)), ((1, 0), (2, 2))]
 
 # starting expression (zeroth order)
 zerothOrderExpression = nnr.startingExp(molecule)
