@@ -41,5 +41,6 @@ latex_string = latexstr.exprSum2Latex(alldersExpr)
 print(latex_string)
 # $$-3(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 5 } }+15(x_0 - x_1)^2(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 7 } }$$
 ```
-The string will have `$$` symbols in the beginning and in the end of it.
-$-3(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 5 } }+15(x_0 - x_1)^2(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 7 } }$
+The string will have `$$` symbols in the beginning and in the end of it:
+
+$$-3(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 5 } }+15(x_0 - x_1)^2(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 7 } }$$
