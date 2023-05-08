@@ -5,28 +5,28 @@
 def exr2Latex(expression):
 
     # if expression is multiplied by zero
-    if expression.coefficient == 0:
+    if expression['coefficient'] == 0:
         return '0'
 
-    multiplier = '' if expression.coefficient == 1 else f'{expression.coefficient}'
+    multiplier = '' if expression['coefficient'] == 1 else f'{expression["coefficient"]}'
 
-    sign = '' if expression.sign == 1 else '-'
-    result = f'\\frac{{ Z_{expression.atoms_pair[0]} Z_{expression.atoms_pair[1]} }} '
+    sign = '' if expression['sign'] == 1 else '-'
+    result = f'\\frac{{ Z_{expression["atoms_pair"][0]} Z_{expression["atoms_pair"][1]} }} '
 
-    denominator = f'{{ R_{{ {expression.atoms_pair[0]}{expression.atoms_pair[1]} }}^{{ {expression.power} }} }}'
+    denominator = f'{{ R_{{ {expression["atoms_pair"][0]}{expression["atoms_pair"][1]} }}^{{ {expression["power"]} }} }}'
 
     vardict = {0: 'x', 1: 'y', 2: 'z'}
     # polynomial part
     uder = ''
 
-    if expression.factoredPoly:
+    if expression["factoredPoly"]:
 
-        for i in expression.factoredPoly.keys():
+        for i in expression['factoredPoly'].keys():
 
             uder += f'({vardict[i[0]]}_{i[1]} - {vardict[i[2]]}_{i[3]})'
 
-            if expression.factoredPoly[i] > 1:
-                uder += f'^{expression.factoredPoly[i]}'
+            if expression['factoredPoly'][i] > 1:
+                uder += f'^{expression["factoredPoly"][i]}'
 
     return sign + multiplier + uder + result + denominator
 

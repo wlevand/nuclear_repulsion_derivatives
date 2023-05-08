@@ -101,7 +101,7 @@ test_SingleMolecule()
 
 # -----------------------------------------------------------
 # single derivative
-curtest_oneder = [(0, 1), (0, 0), (1, 0)]
+curtest_oneder = [(0, 1), (0, 1), (1, 2)]
 zerothOrderExpression = nnr.startingExp(molecule)
 alldersExpr = nnr.general_derivative_Expression(zerothOrderExpression, curtest_oneder)
 

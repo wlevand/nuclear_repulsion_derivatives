@@ -1,104 +1,108 @@
 import numpy as np
 import copy
-from recordclass import recordclass
 
-# class ExpressionDer with attributes 'sign power atoms_pair factoredPoly coefficient'
-#     sign - keeps track of the sign of the expression
-#     power - R**(-power/2) term
-#     atoms_pair - pair of atoms that are considered in the given term; R is a distance between pair[0] and pair[1]
-#     factoredPoly - polynomial in a factored form; a dictionary that keeps track of variables in the polynomial;
+# `ExpressionDer` dictionary represents a generalised term in the full expression of
+#   an analytical derivative of the nuclear-nuclear repulsion energy.
+#   It consists of a polynomial part and distance R power.
+#   E.g., a term -(x_0 - x_1) * Z_0*Z_1 * R^3 has (x_0 - x_1) polynomial part and R^3 part.
+#   These two parts will be differentiated separately and the results will be added.
+
+# ExpressionDer dictionary with keys 'sign', 'power', 'atoms_pair', 'factoredPoly,' 'coefficient'
+#     'sign' - keeps track of the sign of the expression
+#     'power' - R**(-power/2) term
+#     'atoms_pair' - pair of atoms that are considered in the given term; R is a distance between pair[0] and pair[1]
+#     'factoredPoly' - polynomial in a factored form; a dictionary that keeps track of variables in the polynomial;
 #                   key - a tuple of 2 variables (tuples), value - number of such terms
-#     coefficient - coefficient that is accumulated from the power derivatives
+#     'coefficient' - coefficient that is accumulated from the power derivatives
 #  e.g., for term -3*(x_0-x_1)**2 * Z_1*Z_2 * R**(-5/2) :
-#     sign = -1, power = 5, atoms_pair = (0, 1), factoredPoly = {((0, 0), (0, 1)): 2}, coefficient = 3
+#     'sign' = -1, power = 5, 'atoms_pair' = (0, 1), 'factoredPoly' = {((0, 0), (0, 1)): 2}, 'coefficient' = 3
 #
 # A variable is given by a tuple of 2 numbers, first is an index of atom (numbering from 0),
 #                                              second is an index of cartesian coordinate
 # x_0 = (0, 0), y_5 = (1, 5), z_3 = (2, 3)
 
-ExpressionDer = recordclass('ExpressionDer', 'sign power atoms_pair factoredPoly coefficient')
+# template for the ExpressionDer dictionary
+# ExpressionDer = {'sign': 1, 'power': 1, 'atoms_pair': pair, 'factoredPoly': {}, 'coefficient': 1}
 
 
-# Updating attributes of ExpressionDer instance
+# Updating keys of ExpressionDer dictionary
 def updExpression(expression, new):
-
     for i in new:
         ind = ['sign', 'power', 'atoms_pair', 'factoredPoly', 'coefficient'].index(i)
         expression[ind] = new[i]
 
 
-# For a given ExpressionDer instance, +1 to the value with the key 'variable'
+# For a given ExpressionDer dictionary, +1 to the value with the key 'variable' of the ['factoredPoly'] dictionary
 def updPolynomialDict_Add(expr, variable):
+    keyVar = (variable[0], expr['atoms_pair'][0], variable[0], expr['atoms_pair'][1])
 
-    keyVar = (variable[0], expr.atoms_pair[0], variable[0], expr.atoms_pair[1])
-    if keyVar in list(expr.factoredPoly.keys()):
-        expr.factoredPoly[keyVar] += 1
+    if keyVar in list(expr['factoredPoly'].keys()):
+        expr['factoredPoly'][keyVar] += 1
     else:
-        expr.factoredPoly[keyVar] = 1
+        expr['factoredPoly'][keyVar] = 1
 
 
 # Differentiation of the polynomial part of the term (expression)
 def derPolynom(expression, curvar):
-
     newX = copy.deepcopy(expression)
 
     # no operations on zero terms
-    if newX.coefficient == 0.:
+    if newX['coefficient'] == 0.:
         return newX
 
     # check if the expression involves curvar atom
-    if curvar[1] not in newX.atoms_pair:
-        updExpression(newX, {'coefficient': 0.})
+    if curvar[1] not in newX['atoms_pair']:
+        newX.update({'coefficient': 0.})
         return newX
 
     # if no polynomial in expression
-    if not list(newX.factoredPoly.keys()):
-        updExpression(newX, {'coefficient': 0.})
+    if not list(newX['factoredPoly'].keys()):
+        newX.update({'coefficient': 0.})
         return newX
 
     # if not yet in the expression, a term will be added
-    key = (curvar[0], newX.atoms_pair[0], curvar[0], newX.atoms_pair[1])
+    key = (curvar[0], newX['atoms_pair'][0], curvar[0], newX['atoms_pair'][1])
 
-    if key not in list(newX.factoredPoly.keys()):
-        updExpression(newX, {'coefficient': 0.})
+    if key not in list(newX['factoredPoly'].keys()):
+        newX.update({'coefficient': 0.})
 
     else:
 
-        updExpression(newX, {'coefficient': newX.coefficient * newX.factoredPoly[key]})
-        newX.factoredPoly[key] -= 1
-        newsign = newX.sign * (-1) if curvar == (key[2], key[3]) else newX.sign
-        updExpression(newX, {'sign': newsign})
+        newX.update({'coefficient': newX['coefficient'] * newX['factoredPoly'][key]})
+        newX['factoredPoly'][key] -= 1
+        newsign = newX['sign'] * (-1) if curvar == (key[2], key[3]) else newX['sign']
+        newX.update({'sign': newsign})
 
-        if newX.factoredPoly[key] < 1:
-            del newX.factoredPoly[key]
+        if newX['factoredPoly'][key] < 1:
+            del newX['factoredPoly'][key]
 
     return newX
 
 
 # Differentiation of the 1/R**n part of the term (expression)
 def derPower(expression, curvar):
-
     newX = copy.deepcopy(expression)
 
     # no operations on zero terms
-    if newX.coefficient == 0.:
+    if newX['coefficient'] == 0.:
         return newX
 
     # check if the expression involves curvar atom
-    if curvar[1] not in newX.atoms_pair:
-        updExpression(newX, {'coefficient': 0.})
+    if curvar[1] not in newX['atoms_pair']:
+        newX.update({'coefficient': 0.})
         return newX
 
     # sign from R**(-n)
-    nsign = newX.sign * (-1)
+    nsign = newX['sign'] * (-1)
 
     # sign from the (x0-x1) term
-    if curvar[1] == newX.atoms_pair[1]:
+    if curvar[1] == newX['atoms_pair'][1]:
         nsign = nsign * (-1)
 
-    updExpression(newX, {'power': newX.power + 2,
-                         'sign': nsign,
-                         'coefficient': newX.coefficient * newX.power})
+    newX.update({'power': newX['power'] + 2,
+                 'sign': nsign,
+                 'coefficient': newX['coefficient'] * newX['power']})
+
     updPolynomialDict_Add(newX, curvar)
 
     return newX
@@ -106,7 +110,6 @@ def derPower(expression, curvar):
 
 # Sum of derivatives of polynomial and 1/R**n parts of the expression for all terms
 def general_one_order_derivative(expressionSum, var):
-
     total = []
     for expr in expressionSum:
         aa, bb = copy.deepcopy(expr), copy.deepcopy(expr)
@@ -114,23 +117,23 @@ def general_one_order_derivative(expressionSum, var):
         # two new expressions
         a, b = derPolynom(aa, var), derPower(bb, var)
 
-        if a.coefficient != 0.:
+        if a['coefficient'] != 0.:
             total.append(a)
-        if b.coefficient != 0.:
+        if b['coefficient'] != 0.:
             total.append(b)
 
     return total
 
 
 def one_expression_Evaluation(expression, atoms, charges):
-    if expression.coefficient == 0.:
+    if expression['coefficient'] == 0.:
         return 0.
 
     # polynomials such as (x_0 - x_1)
     uders = []
     s = 1
 
-    for k, v in expression.factoredPoly.items():
+    for k, v in expression['factoredPoly'].items():
 
         # e.g. (x_0 - x_1) != 0
         if (atoms[k[1], k[0]] - atoms[k[3], k[2]]) != 0.:
@@ -142,10 +145,11 @@ def one_expression_Evaluation(expression, atoms, charges):
         else:
             return 0.
 
-    denominator = np.linalg.norm(atoms[expression.atoms_pair[0]] - atoms[expression.atoms_pair[1]]) ** expression.power
-    charges = charges[expression.atoms_pair[0]] * charges[expression.atoms_pair[1]]
+    denominator = np.linalg.norm(atoms[expression['atoms_pair'][0]] - atoms[expression['atoms_pair'][1]]) ** expression[
+        'power']
+    charges = charges[expression['atoms_pair'][0]] * charges[expression['atoms_pair'][1]]
 
-    result = charges * expression.sign * expression.coefficient * \
+    result = charges * expression['sign'] * expression['coefficient'] * \
              np.product(np.array(uders)) / denominator
 
     return result
@@ -181,12 +185,12 @@ def general_derivative_Evaluation(listExrp, atoms, charges):
 
 def startingExp(molecule):
     from itertools import combinations
-
     pairss = list(combinations(np.arange(len(molecule)), 2))
+
+    # list of expressions to sum up
     start = []
 
     for pair in pairss:
-        start.append(ExpressionDer(sign=1, power=1, atoms_pair=pair, factoredPoly={}, coefficient=1))
+        start.append({'sign': 1, 'power': 1, 'atoms_pair': pair, 'factoredPoly': {}, 'coefficient': 1})
 
     return start
-
