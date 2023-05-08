@@ -1,5 +1,8 @@
-# nuclear repulsion derivatives expressions to latex string
-def exrt2Latex(expression):
+# Nuclear repulsion derivatives expressions to latex string
+# For usage examples, see README
+
+# construction of a single expression string
+def exr2Latex(expression):
 
     # if expression is multiplied by zero
     if expression.coefficient == 0:
@@ -29,11 +32,9 @@ def exrt2Latex(expression):
 
 
 # returns a LaTeX string for a list of variables
+# variable: tuple/list of tuples - ((0, 0), (1, 5))
 def vars2Latex(variable):
-    """
-    :param variable: tuple/list of tuples - ((0, 0), (1, 5))
-    :return:
-    """
+
     vardict = {0: 'x', 1: 'y', 2: 'z'}
     res = ''
 
@@ -43,12 +44,13 @@ def vars2Latex(variable):
     return '$' + res + '$'
 
 
+# construction of a string for a sum of expressions
 def exprSum2Latex(exprSum):
     res = ''
     count = len(exprSum)
 
     for i in exprSum:
-        addition = exrt2Latex(i)
+        addition = exr2Latex(i)
         res = res + addition if addition[0] != '-' else res[:-1] + addition
         count -= 1
 

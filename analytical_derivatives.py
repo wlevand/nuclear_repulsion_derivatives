@@ -19,7 +19,7 @@ from recordclass import recordclass
 ExpressionDer = recordclass('ExpressionDer', 'sign power atoms_pair factoredPoly coefficient')
 
 
-# updating attributes of an expression
+# Updating attributes of ExpressionDer instance
 def updExpression(expression, new):
 
     for i in new:
@@ -27,7 +27,7 @@ def updExpression(expression, new):
         expression[ind] = new[i]
 
 
-# +1 to the value with the key 'variable'
+# For a given ExpressionDer instance, +1 to the value with the key 'variable'
 def updPolynomialDict_Add(expr, variable):
 
     keyVar = (variable[0], expr.atoms_pair[0], variable[0], expr.atoms_pair[1])
@@ -37,7 +37,7 @@ def updPolynomialDict_Add(expr, variable):
         expr.factoredPoly[keyVar] = 1
 
 
-# Derivation of the polynomial part of the term (expression)
+# Differentiation of the polynomial part of the term (expression)
 def derPolynom(expression, curvar):
 
     newX = copy.deepcopy(expression)
@@ -75,7 +75,7 @@ def derPolynom(expression, curvar):
     return newX
 
 
-# Derivation of the 1/R**n part of the term (expression)
+# Differentiation of the 1/R**n part of the term (expression)
 def derPower(expression, curvar):
 
     newX = copy.deepcopy(expression)
@@ -156,15 +156,17 @@ def general_derivative_Expression(start, vars):
     Returns final expression
     :param start: starting list of terms
     :param vars: cartesian variables - list of tuples of tuples (one variable - 1 tuple)
-    :return: new list of terms after all derivations
+    :return: new list of terms after all differentiations
     """
-    pool = [start]
+    # 'start' is a starting expression sum (zeroth order)
+    current_order = start
 
     for j in vars:
-        l1 = general_one_order_derivative(pool[-1], j)
-        pool[-1] = l1
+        t1 = general_one_order_derivative(current_order, j)
+        # updating starting point as next order derivative expression sum
+        current_order = t1
 
-    return pool[-1]
+    return current_order
 
 
 def general_derivative_Evaluation(listExrp, atoms, charges):
