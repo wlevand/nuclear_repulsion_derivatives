@@ -28,7 +28,12 @@ def exrt2Latex(expression):
     return sign + multiplier + uder + result + denominator
 
 
+# returns a LaTeX string for a list of variables
 def vars2Latex(variable):
+    """
+    :param variable: tuple/list of tuples - ((0, 0), (1, 5))
+    :return:
+    """
     vardict = {0: 'x', 1: 'y', 2: 'z'}
     res = ''
 
