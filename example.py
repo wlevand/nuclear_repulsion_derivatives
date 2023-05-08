@@ -1,7 +1,4 @@
-# Nuclear repusion derivatives
-
-How to use Analytical nuclear-nuclear repulsion derivatives:
-``` python
+# analytical_derivatives.py
 import analytical_derivatives as nnr
 from tests import get_molecule_xyz
 
@@ -17,7 +14,7 @@ molecule, charges = get_molecule_xyz('./molecules/HCOOH.xyz')
 # charges
 # [12, 8, 8, 1, 1]
 
-# fourth order derivative w.r.t. x_1, x_0, y_0, z_2 
+# fourth order derivative w.r.t. x_1, x_0, y_0, z_2
 variables = [(0, 1), (0, 0), (1, 0)]
 
 # starting expression (zeroth order)
@@ -28,18 +25,12 @@ alldersExpr = nnr.general_derivative_Expression(zerothOrderExpression, variables
 
 # evaluation of the sum above
 analytical = nnr.general_derivative_Evaluation(alldersExpr, molecule, charges)
-```
 
-To print LaTeX equations with expression2Latex.py:
-
-``` python
+# -------------------------------------------------------
+# expression2Latex.py
 import expression2Latex as latexstr
 
 # for the final expression above
 latex_string = latexstr.exprSum2Latex(alldersExpr)
 print(latex_string)
 # $$-3(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 5 } }+15(x_0 - x_1)^2(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 7 } }$$
-```
-The string will have `$$` symbols in the beginning and in the end of it:
-
-$$-3(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 5 } }+15(x_0 - x_1)^2(y_0 - y_1)\frac{ Z_0 Z_1 } { R_{ 01 }^{ 7 } }$$
