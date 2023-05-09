@@ -11,24 +11,23 @@ def exr2Latex(expression):
     multiplier = '' if expression['coefficient'] == 1 else f'{expression["coefficient"]}'
 
     sign = '' if expression['sign'] == 1 else '-'
-    result = f'\\frac{{ Z_{expression["atoms_pair"][0]} Z_{expression["atoms_pair"][1]} }} '
+    charges = f'\\frac{{ Z_{expression["atoms_pair"][0]} Z_{expression["atoms_pair"][1]} }} '
 
     denominator = f'{{ R_{{ {expression["atoms_pair"][0]}{expression["atoms_pair"][1]} }}^{{ {expression["power"]} }} }}'
 
     vardict = {0: 'x', 1: 'y', 2: 'z'}
-    # polynomial part
-    uder = ''
+    polynomial = ''
 
     if expression["factoredPoly"]:
 
         for i in expression['factoredPoly'].keys():
 
-            uder += f'({vardict[i[0]]}_{i[1]} - {vardict[i[2]]}_{i[3]})'
+            polynomial += f'({vardict[i[0]]}_{i[1]} - {vardict[i[2]]}_{i[3]})'
 
             if expression['factoredPoly'][i] > 1:
-                uder += f'^{expression["factoredPoly"][i]}'
+                polynomial += f'^{expression["factoredPoly"][i]}'
 
-    return sign + multiplier + uder + result + denominator
+    return sign + multiplier + polynomial + charges + denominator
 
 
 # returns a LaTeX string for a list of variables

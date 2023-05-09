@@ -14,7 +14,7 @@ import copy
 #     'factoredPoly' - polynomial in a factored form; a dictionary that keeps track of variables in the polynomial;
 #                   key - a tuple of 2 variables (tuples), value - number of such terms
 #     'coefficient' - coefficient that is accumulated from the power derivatives
-#  e.g., for term -3*(x_0-x_1)**2 * Z_1*Z_2 * R**(-5/2) :
+#  e.g., for term -3*(x_0-x_1)**2 * Z_0*Z_1 * R**(-5/2) :
 #     'sign' = -1, power = 5, 'atoms_pair' = (0, 1), 'factoredPoly' = {((0, 0), (0, 1)): 2}, 'coefficient' = 3
 #
 # A variable is given by a tuple of 2 numbers, first is an index of atom (numbering from 0),
@@ -32,12 +32,21 @@ def updExpression(expression, new):
         expression[ind] = new[i]
 
 
-# For a given ExpressionDer dictionary, +1 to the value with the key 'variable' of the ['factoredPoly'] dictionary
+# ['factoredPoly'] dictionary is headed with a tuple of (cart_A, atom_A, cart_B, atom_B).
+# E.g. (0, 0, 0, 1) represents (x_0 - x_1)
+
+# This function adds one to the value for a key of the ['factoredPoly'] dictionary
 def updPolynomialDict_Add(expr, variable):
+    # (cart_A, atom_A, cart_B, atom_B)
+    # the key is given by pair of atoms and the cartesian component of the `variable`
     keyVar = (variable[0], expr['atoms_pair'][0], variable[0], expr['atoms_pair'][1])
 
+    # if the `expr` has already such term, add +1 to the value (which represents the power):
+    #   (x_0 - x_1)**value
     if keyVar in list(expr['factoredPoly'].keys()):
         expr['factoredPoly'][keyVar] += 1
+
+    # if not in the `expr`, then create a key:value pair
     else:
         expr['factoredPoly'][keyVar] = 1
 
@@ -70,6 +79,8 @@ def derPolynom(expression, curvar):
 
         newX.update({'coefficient': newX['coefficient'] * newX['factoredPoly'][key]})
         newX['factoredPoly'][key] -= 1
+
+        # e.g., for (x_a - x_b), if curvar is x_b then change sign
         newsign = newX['sign'] * (-1) if curvar == (key[2], key[3]) else newX['sign']
         newX.update({'sign': newsign})
 
@@ -130,17 +141,16 @@ def one_expression_Evaluation(expression, atoms, charges):
         return 0.
 
     # polynomials such as (x_0 - x_1)
-    uders = []
-    s = 1
+    polynomial = 1.
 
     for k, v in expression['factoredPoly'].items():
 
         # e.g. (x_0 - x_1) != 0
         if (atoms[k[1], k[0]] - atoms[k[3], k[2]]) != 0.:
 
-            mltpl = s * (atoms[k[1], k[0]] - atoms[k[3], k[2]])
+            mltpl = (atoms[k[1], k[0]] - atoms[k[3], k[2]])
             for n in range(v):
-                uders.append(mltpl)
+                polynomial *= mltpl
 
         else:
             return 0.
@@ -149,20 +159,16 @@ def one_expression_Evaluation(expression, atoms, charges):
         'power']
     charges = charges[expression['atoms_pair'][0]] * charges[expression['atoms_pair'][1]]
 
-    result = charges * expression['sign'] * expression['coefficient'] * \
-             np.product(np.array(uders)) / denominator
-
-    return result
+    return charges * expression['sign'] * expression['coefficient'] * polynomial / denominator
 
 
 def general_derivative_Expression(start, vars):
     """
-    Returns final expression
-    :param start: starting list of terms
+    Returns the final expression
+    :param start: starting list of terms (sum of expressions)
     :param vars: cartesian variables - list of tuples of tuples (one variable - 1 tuple)
     :return: new list of terms after all differentiations
     """
-    # 'start' is a starting expression sum (zeroth order)
     current_order = start
 
     for j in vars:

@@ -28,11 +28,19 @@ def upd1varmolDOWN(molecule, variable, h):
     return newmol
 
 
+def mol_difference(molecule, variable, h, sign):
+    import copy
+    newmol = copy.deepcopy(molecule)
+    newmol[variable[1], variable[0]] += sign * h
+
+    return newmol
+
+
 def numericalDerGeneral(molecule, charges, h, variables):
     import analytical_derivatives as nnr
 
-    molUp = upd1varmolUP(molecule, variables[-1], h)
-    molDown = upd1varmolDOWN(molecule, variables[-1], h)
+    molUp = mol_difference(molecule, variables[-1], h, sign=1)
+    molDown = mol_difference(molecule, variables[-1], h, sign=-1)
 
     if len(variables) == 1:
         return (nuc_repulsionZeroOrder(molUp, charges) - nuc_repulsionZeroOrder(molDown, charges)) / (2 * h)
