@@ -109,5 +109,6 @@ alldersExpr = nnr.general_derivative_Expression(zerothOrderExpression, curtest_o
 analytical = nnr.general_derivative_Evaluation(alldersExpr, molecule, charges)
 numerical = num.numericalDerGeneral(molecule, charges, 10 ** (-5), curtest_oneder)
 
-# print(latexstr.exprSum2Latex(alldersExpr))
+# expression sum in LaTeX
+print(latexstr.exprSum2Latex(alldersExpr))
 # print(latexstr.exprSum2Latex(zerothOrderExpression))

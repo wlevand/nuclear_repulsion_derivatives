@@ -147,7 +147,6 @@ def one_expression_Evaluation(expression, atoms, charges):
     for k in expression['factoredPoly']:
 
         # e.g. (x_0 - x_1) != 0
-        # print(atoms[expression['atoms_pair'][0], k], atoms[expression['atoms_pair'][1], k])
         polyn_val = atoms[expression['atoms_pair'][0], k] - atoms[expression['atoms_pair'][1], k]
         if polyn_val != 0.:
 
