@@ -68,7 +68,7 @@ for index, file in enumerate(dir_list):
 # dict_keys([''HCOOH', 'HF'])
 
 # choose a test molecule
-mol_name = 'CH4'
+mol_name = 'HCOOH'
 molecule, charges = molecules[mol_name]
 
 # getting lists of combinations of all variables for four orders of derivatives (1-4)
