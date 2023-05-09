@@ -20,12 +20,12 @@ def exr2Latex(expression):
 
     if expression["factoredPoly"]:
 
-        for i in expression['factoredPoly'].keys():
+        for cart_comp in expression['factoredPoly']:
 
-            polynomial += f'({vardict[i[0]]}_{i[1]} - {vardict[i[2]]}_{i[3]})'
+            polynomial += f'({vardict[cart_comp]}_{expression["atoms_pair"][0]} - {vardict[cart_comp]}_{expression["atoms_pair"][1]})'
 
-            if expression['factoredPoly'][i] > 1:
-                polynomial += f'^{expression["factoredPoly"][i]}'
+            if expression['factoredPoly'][cart_comp] > 1:
+                polynomial += f'^{expression["factoredPoly"][cart_comp]}'
 
     return sign + multiplier + polynomial + charges + denominator
 

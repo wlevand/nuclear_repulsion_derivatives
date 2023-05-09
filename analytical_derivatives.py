@@ -39,11 +39,11 @@ def updExpression(expression, new):
 def updPolynomialDict_Add(expr, variable):
     # (cart_A, atom_A, cart_B, atom_B)
     # the key is given by pair of atoms and the cartesian component of the `variable`
-    keyVar = (variable[0], expr['atoms_pair'][0], variable[0], expr['atoms_pair'][1])
+    keyVar = (variable[0])
 
     # if the `expr` has already such term, add +1 to the value (which represents the power):
     #   (x_0 - x_1)**value
-    if keyVar in list(expr['factoredPoly'].keys()):
+    if keyVar in expr['factoredPoly']:
         expr['factoredPoly'][keyVar] += 1
 
     # if not in the `expr`, then create a key:value pair
@@ -61,28 +61,29 @@ def derPolynom(expression, curvar):
 
     # check if the expression involves curvar atom
     if curvar[1] not in newX['atoms_pair']:
-        newX.update({'coefficient': 0.})
+        newX['coefficient'] = 0.
         return newX
 
     # if no polynomial in expression
-    if not list(newX['factoredPoly'].keys()):
-        newX.update({'coefficient': 0.})
+    if not newX['factoredPoly']:
+        newX['coefficient'] = 0.
         return newX
 
     # if not yet in the expression, a term will be added
-    key = (curvar[0], newX['atoms_pair'][0], curvar[0], newX['atoms_pair'][1])
+    key = (curvar[0])
 
-    if key not in list(newX['factoredPoly'].keys()):
-        newX.update({'coefficient': 0.})
+    if key not in newX['factoredPoly']:
+
+        newX['coefficient'] = 0.
 
     else:
 
-        newX.update({'coefficient': newX['coefficient'] * newX['factoredPoly'][key]})
+        newX['coefficient'] = newX['coefficient'] * newX['factoredPoly'][key]
         newX['factoredPoly'][key] -= 1
 
         # e.g., for (x_a - x_b), if curvar is x_b then change sign
-        newsign = newX['sign'] * (-1) if curvar == (key[2], key[3]) else newX['sign']
-        newX.update({'sign': newsign})
+        #   curvar[1] - atom number of curvar
+        newX['sign'] = newX['sign'] * (-1) if curvar[1] == newX['atoms_pair'][1] else newX['sign']
 
         if newX['factoredPoly'][key] < 1:
             del newX['factoredPoly'][key]
@@ -100,7 +101,7 @@ def derPower(expression, curvar):
 
     # check if the expression involves curvar atom
     if curvar[1] not in newX['atoms_pair']:
-        newX.update({'coefficient': 0.})
+        newX['coefficient'] = 0.
         return newX
 
     # sign from R**(-n)
@@ -143,14 +144,15 @@ def one_expression_Evaluation(expression, atoms, charges):
     # polynomials such as (x_0 - x_1)
     polynomial = 1.
 
-    for k, v in expression['factoredPoly'].items():
+    for k in expression['factoredPoly']:
 
         # e.g. (x_0 - x_1) != 0
-        if (atoms[k[1], k[0]] - atoms[k[3], k[2]]) != 0.:
+        # print(atoms[expression['atoms_pair'][0], k], atoms[expression['atoms_pair'][1], k])
+        polyn_val = atoms[expression['atoms_pair'][0], k] - atoms[expression['atoms_pair'][1], k]
+        if polyn_val != 0.:
 
-            mltpl = (atoms[k[1], k[0]] - atoms[k[3], k[2]])
-            for n in range(v):
-                polynomial *= mltpl
+            for n in range(expression['factoredPoly'][k]):
+                polynomial *= polyn_val
 
         else:
             return 0.

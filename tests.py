@@ -68,7 +68,7 @@ for index, file in enumerate(dir_list):
 # dict_keys([''HCOOH', 'HF'])
 
 # choose a test molecule
-mol_name = 'HCOOH'
+mol_name = 'CH4'
 molecule, charges = molecules[mol_name]
 
 # getting lists of combinations of all variables for four orders of derivatives (1-4)
@@ -101,7 +101,7 @@ test_SingleMolecule()
 
 # -----------------------------------------------------------
 # single derivative
-curtest_oneder = [(0, 1), (0, 1), (1, 2)]
+curtest_oneder = [(0, 1), (0, 1), (1, 1)]
 zerothOrderExpression = nnr.startingExp(molecule)
 alldersExpr = nnr.general_derivative_Expression(zerothOrderExpression, curtest_oneder)
 
@@ -109,5 +109,5 @@ alldersExpr = nnr.general_derivative_Expression(zerothOrderExpression, curtest_o
 analytical = nnr.general_derivative_Evaluation(alldersExpr, molecule, charges)
 numerical = num.numericalDerGeneral(molecule, charges, 10 ** (-5), curtest_oneder)
 
-print(latexstr.exprSum2Latex(alldersExpr))
+# print(latexstr.exprSum2Latex(alldersExpr))
 # print(latexstr.exprSum2Latex(zerothOrderExpression))
