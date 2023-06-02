@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 
+
 # `ExpressionDer` dictionary represents a generalised term in the full expression of
 #   an analytical derivative of the nuclear-nuclear repulsion energy.
 #   It consists of a polynomial part and distance R power.
@@ -201,3 +202,19 @@ def startingExp(molecule):
         start.append({'sign': 1, 'power': 1, 'atoms_pair': pair, 'factoredPoly': {}, 'coefficient': 1})
 
     return start
+
+
+# One call wrapper function
+def nucRepulsionDer(molecule, charges, vartuple):
+
+    lsall = list(tuple([vartuple]))
+
+    # starting expression (zeroth order)
+    zerothOrderExpression = startingExp(molecule)
+    # list of expressions (terms of the final sum)
+    alldersExpr = general_derivative_Expression(zerothOrderExpression, lsall)
+
+    # evaluation of the sum above
+    analytical = general_derivative_Evaluation(alldersExpr, molecule, charges)
+
+    return analytical
