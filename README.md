@@ -1,4 +1,4 @@
-# Nuclear repusion derivatives
+# Nuclear repulsion analytic derivatives
 
 How to use Analytical nuclear-nuclear repulsion derivatives:
 ``` python
